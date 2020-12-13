@@ -37,6 +37,10 @@ func (rout Vpnrouting) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dn
 	resolver := resolve(state.Name(), geo)
 	fmt.Println(resolver)
 
+	if resolver.IP == "" {
+		return plugin.NextOrFailure(rout.Name(), rout.Next, ctx, w, r)
+	}
+
 	switch state.Family() {
 	case 1:
 		rr = new(dns.A)

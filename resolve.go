@@ -13,9 +13,9 @@ type Resolver struct {
 	IP string `json:"ip"`
 }
 
-func resolve(address string, c GeoIP) Resolver {
+func resolve(address string, c GeoIP) *Resolver {
 	postBody, _ := json.Marshal(map[string]string{
-		"url": "www.example.com",
+		"url": address,
 		"Lat": fmt.Sprint(c.Lat),
 		"Lon": fmt.Sprint(c.Lon),
 	})
@@ -30,9 +30,9 @@ func resolve(address string, c GeoIP) Resolver {
 	if err != nil {
 		fmt.Println(err)
 	}
-	var result Resolver
+	result := new(Resolver)
 	// Unmarshal the JSON byte slice to a GeoIP struct
-	err = json.Unmarshal(body, &result)
+	err = json.Unmarshal(body, result)
 	if err != nil {
 		fmt.Println(err)
 	}

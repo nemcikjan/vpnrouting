@@ -70,7 +70,7 @@ func TestVpnrouting(t *testing.T) {
 		if code != int(tc.expectedCode) {
 			t.Errorf("Test %d: Expected status code %d, but got %d", i, tc.expectedCode, code)
 		}
-		if len(tc.expectedReply) != 0 {
+		if err == nil && len(tc.expectedReply) != 0 {
 			for i, expected := range tc.expectedReply {
 				actual := rec.Msg.Extra[i].Header().Name
 				fmt.Println(rec.Msg.Extra[i])
