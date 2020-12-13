@@ -33,20 +33,20 @@ func (rout Vpnrouting) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dn
 	ip := state.IP()
 	var rr dns.RR
 
+	geo := geoLookup(ip)
+	resolver := resolve(state.Name(), geo)
+	fmt.Println(resolver)
+
 	switch state.Family() {
 	case 1:
 		rr = new(dns.A)
 		rr.(*dns.A).Hdr = dns.RR_Header{Name: state.QName(), Rrtype: dns.TypeA, Class: state.QClass()}
-		rr.(*dns.A).A = net.ParseIP(ip).To4()
+		rr.(*dns.A).A = net.ParseIP(resolver.IP).To4()
 	case 2:
 		rr = new(dns.AAAA)
 		rr.(*dns.AAAA).Hdr = dns.RR_Header{Name: state.QName(), Rrtype: dns.TypeAAAA, Class: state.QClass()}
 		rr.(*dns.AAAA).AAAA = net.ParseIP(ip)
 	}
-
-	geo := GeoLookup(state.IP())
-	resolver := resolve(geo)
-	fmt.Println(resolver)
 	srv := new(dns.SRV)
 	srv.Hdr = dns.RR_Header{Name: "_" + state.Proto() + "." + state.QName(), Rrtype: dns.TypeSRV, Class: state.QClass()}
 	if state.QName() == "." {
@@ -60,5 +60,5 @@ func (rout Vpnrouting) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dn
 
 	w.WriteMsg(a)
 
-	return 0, nil
+	return dns.RcodeSuccess, nil
 }

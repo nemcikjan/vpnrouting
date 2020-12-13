@@ -24,11 +24,11 @@ type GeoIP struct {
 }
 
 // GeoLookup fn
-func GeoLookup(address string) GeoIP {
+func geoLookup(address string) GeoIP {
 	// Use freegeoip.net to get a JSON response
 	// There is also /xml/ and /csv/ formats available
 	// http://ip-api.com/json
-	response, err := http.Get("https://freegeoip.net/json/62.197.243.174")
+	response, err := http.Get("http://api.ipstack.com/188.167.251.122?access_key=bab3a03dd8ff3f11b2212a2f57c91089")
 	if err != nil {
 		fmt.Println(err)
 	}
