@@ -12,7 +12,7 @@ import (
 )
 
 func TestVpnrouting(t *testing.T) {
-	rr := Vpnrouting{}
+	rr := New()
 	// if rr.Name() != name {
 	// 	t.Errorf("expected plugin name: %s, got %s", rr.Name(), name)
 	// }

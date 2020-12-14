@@ -13,16 +13,17 @@ type Resolver struct {
 	IP string `json:"ip"`
 }
 
-func resolve(address string, c GeoIP) *Resolver {
+func (r Vpnrouting) resolve(address string, c GeoIP) (*Resolver, error) {
 	postBody, _ := json.Marshal(map[string]string{
 		"url": address,
 		"Lat": fmt.Sprint(c.Lat),
 		"Lon": fmt.Sprint(c.Lon),
 	})
 	responseBody := bytes.NewBuffer(postBody)
-	response, err := http.Post("http://localhost:3000/discovery/closest-node", "application/json", responseBody)
+	response, err := http.Post(r.ResolverHostname()+`/discovery/closest-node`, "application/json", responseBody)
 	if err != nil {
 		fmt.Println(err)
+		return nil, err
 	}
 	defer response.Body.Close()
 
@@ -37,5 +38,5 @@ func resolve(address string, c GeoIP) *Resolver {
 		fmt.Println(err)
 	}
 
-	return result
+	return result, nil
 }

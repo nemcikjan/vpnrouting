@@ -4,7 +4,6 @@ package vpnrouting
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"strconv"
 
@@ -17,10 +16,25 @@ const name = "vpnrouting"
 
 // Vpnrouting is a plugin that returns your IP address, port and the protocol used for connecting
 // to CoreDNS.
-type Vpnrouting struct{ Next plugin.Handler }
+type Vpnrouting struct {
+	Next         plugin.Handler
+	ResolverIP   string
+	ResolverPort int
+}
+
+// New default values
+func New() *Vpnrouting {
+	return &Vpnrouting{
+		ResolverIP:   "127.0.0.1",
+		ResolverPort: 3000,
+	}
+}
 
 // Name implements the Handler interface.
 func (rout Vpnrouting) Name() string { return name }
+
+// ResolverHostname d
+func (rout Vpnrouting) ResolverHostname() string { return "http://" + rout.ResolverIP + ":3000" }
 
 // ServeDNS implements the plugin.Handler interface.
 func (rout Vpnrouting) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (int, error) {
@@ -34,8 +48,11 @@ func (rout Vpnrouting) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dn
 	var rr dns.RR
 
 	geo := geoLookup(ip)
-	resolver := resolve(state.Name(), geo)
-	fmt.Println(resolver)
+	resolver, err := rout.resolve(state.Name(), geo)
+
+	if err != nil {
+		return dns.RcodeServerFailure, err
+	}
 
 	if resolver.IP == "" {
 		return plugin.NextOrFailure(rout.Name(), rout.Next, ctx, w, r)
