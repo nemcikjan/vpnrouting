@@ -1,0 +1,21 @@
+syntax = "proto3";
+option go_package = "github.com/JanNemcik/vpnrouting";
+
+// The greeting service definition.
+service ServiceDiscoveryService {
+  // Sends a greeting
+  rpc GetClosestNode (ServiceRequest) returns (ServiceResponse) {}
+}
+
+// The request message containing the user's name.
+message ServiceRequest {
+  string url = 1;
+  string Lat = 2;
+  string Lng = 3;
+}
+
+
+// The response message containing the greetings
+message ServiceResponse {
+  string ip = 1;
+}

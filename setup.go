@@ -41,6 +41,5 @@ func setup(c *caddy.Controller) error {
 		routing.Next = next
 		return routing
 	})
-
 	return nil
 }
