@@ -38,11 +38,11 @@ func (rout Vpnrouting) Name() string { return name }
 
 // ResolverHostname d
 func (rout Vpnrouting) ResolverHostname() string {
-	return "http://" + rout.ResolverIP + ":" + fmt.Sprint(rout.ResolverGrpcPort)
+	return "http://" + rout.ResolverIP + ":" + fmt.Sprint(rout.ResolverPort)
 }
 
 func (rout Vpnrouting) ResolveGrpcAddress() string {
-	return rout.ResolverIP + ":" + fmt.Sprint(rout.ResolverPort)
+	return rout.ResolverIP + ":" + fmt.Sprint(rout.ResolverGrpcPort)
 }
 
 // ServeDNS implements the plugin.Handler interface.
@@ -57,7 +57,7 @@ func (rout Vpnrouting) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dn
 	var rr dns.RR
 
 	geo := geoLookup(ip)
-	resolver, err := rout.resolve(state.Name(), geo)
+	resolver, err := rout.grpcResolve(state.Name(), geo)
 
 	if err != nil {
 		return dns.RcodeServerFailure, err
