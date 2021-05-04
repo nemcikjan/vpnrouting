@@ -28,7 +28,8 @@ func geoLookup(address string) GeoIP {
 	// Use freegeoip.net to get a JSON response
 	// There is also /xml/ and /csv/ formats available
 	// http://ip-api.com/json
-	response, err := http.Get("http://api.ipstack.com/188.167.251.122?access_key=bab3a03dd8ff3f11b2212a2f57c91089")
+	fmt.Println("Geo lookup for:" + address)
+	response, err := http.Get("http://api.ipstack.com/" + address + "?access_key=bab3a03dd8ff3f11b2212a2f57c91089")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -41,6 +42,7 @@ func geoLookup(address string) GeoIP {
 	if err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println("Geo lookup result:" + fmt.Sprint(response.Body))
 	var geo GeoIP
 	// Unmarshal the JSON byte slice to a GeoIP struct
 	err = json.Unmarshal(body, &geo)
