@@ -3,8 +3,12 @@ package vpnrouting
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
+
+	"github.com/maxmind/mmdbinspect/pkg/mmdbinspect"
+)
+
+const (
+	CityDBPath = "/root/coredns/GeoLite2-City.mmdb"
 )
 
 // GeoIP struct
@@ -29,23 +33,37 @@ func geoLookup(address string) GeoIP {
 	// There is also /xml/ and /csv/ formats available
 	// http://ip-api.com/json
 	fmt.Println("Geo lookup for:" + address)
-	response, err := http.Get("http://api.ipstack.com/" + address + "?access_key=bab3a03dd8ff3f11b2212a2f57c91089")
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer response.Body.Close()
+
+	reader, err := mmdbinspect.OpenDB(CityDBPath)
+	records, err := mmdbinspect.RecordsForNetwork(*reader, address)
+	stringJSON, err := mmdbinspect.RecordToString(records)
+	var rec []map[string]map[string]map[string]float32
+
+	json.Unmarshal([]byte(stringJSON), &rec)
+	location := rec[0]["Record"]["location"]
+	fmt.Println(location["latitude"], location["longitude"])
+
+	// response, err := http.Get("http://api.ipstack.com/" + address + "?access_key=bab3a03dd8ff3f11b2212a2f57c91089")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// defer response.Body.Close()
 
 	// response.Body() is a reader type. We have
 	// to use ioutil.ReadAll() to read the data
 	// in to a byte slice(string)
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		fmt.Println(err)
+	// body, err := ioutil.ReadAll(response.Body)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// fmt.Println("Geo lookup result:" + fmt.Sprint(response.Body))
+	geo := GeoIP{
+		Lat: location["latitude"],
+		Lon: location["longitude"],
+		IP:  address,
 	}
-	fmt.Println("Geo lookup result:" + fmt.Sprint(response.Body))
-	var geo GeoIP
 	// Unmarshal the JSON byte slice to a GeoIP struct
-	err = json.Unmarshal(body, &geo)
+	// err = json.Unmarshal(body, &geo)
 	if err != nil {
 		fmt.Println(err)
 	}

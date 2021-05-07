@@ -81,3 +81,12 @@ func TestVpnrouting(t *testing.T) {
 		}
 	}
 }
+
+func TestGeoResolve(t *testing.T) {
+	ips := []string{"18.223.126.180", "147.175.70.15", "95.102.35.162", "67.205.180.242"}
+	for _, ip := range ips {
+		geo := geoLookup(ip)
+		fmt.Println(geo)
+	}
+
+}
