@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	CityDBPath = "/Users/jannemcik/Projects/dp/geo_client/GeoLite2-City_20210507/GeoLite2-City.mmdb"
+	CityDBPath = "/root/coredns/GeoLite2-City.mmdb"
 )
 
 // GeoIP struct
@@ -35,6 +35,10 @@ func geoLookup(address string) (*GeoIP, error) {
 	fmt.Println("Geo lookup for:" + address)
 
 	reader, err := mmdbinspect.OpenDB(CityDBPath)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
 	records, err := mmdbinspect.RecordsForNetwork(*reader, address)
 	if err != nil {
 		fmt.Println(err)
