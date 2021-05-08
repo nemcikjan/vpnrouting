@@ -58,7 +58,7 @@ func (rout Vpnrouting) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dn
 
 	geo, err := geoLookup(ip)
 	if err != nil {
-		return dns.RcodeServerFailure, err
+		return plugin.NextOrFailure(rout.Name(), rout.Next, ctx, w, r)
 	}
 	resolver, err := rout.grpcResolve(state.Name(), geo)
 
