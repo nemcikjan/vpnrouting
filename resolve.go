@@ -13,7 +13,7 @@ type Resolver struct {
 	IP string `json:"ip"`
 }
 
-func (r Vpnrouting) resolve(address string, c GeoIP) (*Resolver, error) {
+func (r Vpnrouting) resolve(address string, c *GeoIP) (*Resolver, error) {
 	postBody, _ := json.Marshal(map[string]string{
 		"url": address,
 		"Lat": fmt.Sprint(c.Lat),
