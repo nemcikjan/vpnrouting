@@ -13,7 +13,7 @@ const (
 	address = "localhost:8888"
 )
 
-func (r Vpnrouting) grpcResolve(url string, geo GeoIP) (*Resolver, error) {
+func (r Vpnrouting) grpcResolve(url string, geo *GeoIP) (*Resolver, error) {
 	conn, err := grpc.Dial(r.ResolveGrpcAddress(), grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)

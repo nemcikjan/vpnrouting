@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	CityDBPath = "/root/coredns/GeoLite2-City.mmdb"
+	CityDBPath = "/Users/jannemcik/Projects/dp/geo_client/GeoLite2-City_20210507/GeoLite2-City.mmdb"
 )
 
 // GeoIP struct
@@ -28,7 +28,7 @@ type GeoIP struct {
 }
 
 // GeoLookup fn
-func geoLookup(address string) GeoIP {
+func geoLookup(address string) (*GeoIP, error) {
 	// Use freegeoip.net to get a JSON response
 	// There is also /xml/ and /csv/ formats available
 	// http://ip-api.com/json
@@ -36,11 +36,20 @@ func geoLookup(address string) GeoIP {
 
 	reader, err := mmdbinspect.OpenDB(CityDBPath)
 	records, err := mmdbinspect.RecordsForNetwork(*reader, address)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
 	stringJSON, err := mmdbinspect.RecordToString(records)
-	var rec []map[string]map[string]map[string]float32
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
 
+	var rec []map[string]map[string]map[string]float32
 	json.Unmarshal([]byte(stringJSON), &rec)
 	location := rec[0]["Record"]["location"]
+
 	fmt.Println(location["latitude"], location["longitude"])
 
 	// response, err := http.Get("http://api.ipstack.com/" + address + "?access_key=bab3a03dd8ff3f11b2212a2f57c91089")
@@ -57,7 +66,7 @@ func geoLookup(address string) GeoIP {
 	// 	fmt.Println(err)
 	// }
 	// fmt.Println("Geo lookup result:" + fmt.Sprint(response.Body))
-	geo := GeoIP{
+	geo := &GeoIP{
 		Lat: location["latitude"],
 		Lon: location["longitude"],
 		IP:  address,
@@ -68,5 +77,5 @@ func geoLookup(address string) GeoIP {
 		fmt.Println(err)
 	}
 
-	return geo
+	return geo, nil
 }
